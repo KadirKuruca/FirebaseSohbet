@@ -44,9 +44,10 @@ class RegisterActivity : AppCompatActivity() {
 
                         if(p0.isSuccessful){
                             Toast.makeText(this@RegisterActivity, "Kayıt İşlemi Başarılı.",Toast.LENGTH_SHORT).show()
+                            onayMailGonder()
                             FirebaseAuth.getInstance().signOut() // Kullanıcının kayıt olduktan sonra email onaylamadan giriş yapmasını engelliyoruz.
-                            intent = Intent(this@RegisterActivity,LoginActivity::class.java)
-                            startActivity(intent)
+                            var intentLogin = Intent(this@RegisterActivity,LoginActivity::class.java)
+                            startActivity(intentLogin)
                         }
                         else{
                             Toast.makeText(this@RegisterActivity, "Kayıt İşlemi Sürerken Hata Oluştu.\n"+p0.exception?.message,Toast.LENGTH_SHORT).show()
@@ -56,6 +57,24 @@ class RegisterActivity : AppCompatActivity() {
         progressBarGizle()
     }
 
+    private fun onayMailGonder() {
+
+        var kullanici = FirebaseAuth.getInstance().currentUser
+        if(kullanici != null){
+            kullanici.sendEmailVerification()
+                    .addOnCompleteListener(object : OnCompleteListener<Void>{
+                        override fun onComplete(p0: Task<Void>) {
+                            if(p0.isSuccessful){
+                                Toast.makeText(this@RegisterActivity, "Email Adresinize Onay Maili Gönderildi.",Toast.LENGTH_SHORT).show()
+                            }
+                            else{
+                                Toast.makeText(this@RegisterActivity,"Onay Maili Gönderilirken Hata Oluştu :\n"+p0.exception?.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                    })
+        }
+    }
     private fun progressBarGoster(){
         progressBar.visibility = View.VISIBLE
     }
