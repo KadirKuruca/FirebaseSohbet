@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "253658205",
+    "firebase_url": "https://kotlinfirebase-ec5e9.firebaseio.com",
+    "project_id": "kotlinfirebase-ec5e9",
+    "storage_bucket": "kotlinfirebase-ec5e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:253658205:android:b7d01327149bb541",
+        "android_client_info": {
+          "package_name": "com.kadirkuruca.firebaseauthentication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "253658205-dgeesomr8sm8uga9imbj8vi6km1oq9mh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJa8qKUiKyVzVj-HJy0ro93u1b7fT44pE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
