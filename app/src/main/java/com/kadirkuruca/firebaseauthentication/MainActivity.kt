@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +16,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initAuthStateListener()
+    }
+
+    private fun setKullaniciBilgileri(){
+        var kullanici = FirebaseAuth.getInstance().currentUser
+        if(kullanici != null){
+            if(kullanici.displayName.isNullOrEmpty()){
+                tvKullaniciAdi.setText("Tanımlanmadı")
+            }else tvKullaniciAdi.setText(kullanici.displayName)
+
+            tvKullaniciEmail.setText(kullanici.email)
+            tvKullaniciUID.setText(kullanici.uid)
+        }
     }
 
     private fun initAuthStateListener() {
@@ -47,6 +60,12 @@ class MainActivity : AppCompatActivity() {
                 cikisYap()
                 return true
             }
+
+            R.id.hesapAyarlari -> {
+                var hesapIntent = Intent(this,HesapActivity::class.java)
+                startActivity(hesapIntent)
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -59,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         kullaniciyiKontrolEt()
+        setKullaniciBilgileri()
     }
 
     private fun kullaniciyiKontrolEt() {
