@@ -62,6 +62,12 @@ class LoginActivity : AppCompatActivity() {
             var mailDialog = OnayMailFragment()
             mailDialog.show(supportFragmentManager,"MailOnayDialog")
         }
+
+        tvSifremiUnuttum.setOnClickListener {
+
+            var dialogSifreyiGonder = SifreSifirlaDialogFragment()
+            dialogSifreyiGonder.show(supportFragmentManager,"gosterDialogSifre")
+        }
     }
 
     private fun progressBarGoster(){
