@@ -3,6 +3,8 @@ package com.kadirkuruca.firebaseauthentication
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentManager
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
@@ -35,7 +37,11 @@ class LoginActivity : AppCompatActivity() {
 
                                 if(p0.isSuccessful){
                                     progressBarGizle()
-                                    Toast.makeText(this@LoginActivity,"Giriş Başarılı : "+FirebaseAuth.getInstance().currentUser?.email,Toast.LENGTH_SHORT).show()
+
+                                    if(!p0.result.user.isEmailVerified){
+                                        FirebaseAuth.getInstance().signOut()
+                                    }
+                                    //Toast.makeText(this@LoginActivity,"Giriş Başarılı : "+FirebaseAuth.getInstance().currentUser?.email,Toast.LENGTH_SHORT).show()
                                 }
                                 else{
                                     Toast.makeText(this@LoginActivity,"Giriş Yaparken Hata Oluştu.\n"+p0.exception?.message,Toast.LENGTH_SHORT).show()
@@ -50,6 +56,11 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this@LoginActivity,"Alanları Boş Bırakmayınız.",Toast.LENGTH_SHORT).show()
             }
 
+        }
+
+        tvOnayMail.setOnClickListener {
+            var mailDialog = OnayMailFragment()
+            mailDialog.show(supportFragmentManager,"MailOnayDialog")
         }
     }
 
