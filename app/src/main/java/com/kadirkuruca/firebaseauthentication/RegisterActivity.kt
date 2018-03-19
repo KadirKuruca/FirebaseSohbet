@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_register.*
 
 class RegisterActivity : AppCompatActivity() {
@@ -43,11 +44,27 @@ class RegisterActivity : AppCompatActivity() {
                     override fun onComplete(p0: Task<AuthResult>) {
 
                         if(p0.isSuccessful){
-                            Toast.makeText(this@RegisterActivity, "Kayıt İşlemi Başarılı.",Toast.LENGTH_SHORT).show()
-                            onayMailGonder()
-                            FirebaseAuth.getInstance().signOut() // Kullanıcının kayıt olduktan sonra email onaylamadan giriş yapmasını engelliyoruz.
-                            var intentLogin = Intent(this@RegisterActivity,LoginActivity::class.java)
-                            startActivity(intentLogin)
+
+                            //Firebase Kullanici Verileri
+                            var databaseKullanici = Kullanici()
+                            databaseKullanici.isim = etEmail.text.toString().substring(0,etEmail.text.toString().indexOf("@"))
+                            databaseKullanici.kullanici_id = FirebaseAuth.getInstance().currentUser?.uid
+                            databaseKullanici.profil_resim = ""
+                            databaseKullanici.telefon = "Tanımlanmadı"
+                            databaseKullanici.seviye = "1"
+
+                            FirebaseDatabase.getInstance().reference
+                                    .child("kullanici")
+                                    .child(FirebaseAuth.getInstance().currentUser?.uid)
+                                    .setValue(databaseKullanici).addOnCompleteListener { task ->
+                                if(task.isSuccessful){
+                                    onayMailGonder()
+                                    Toast.makeText(this@RegisterActivity, "Kayıt İşlemi Başarılı.",Toast.LENGTH_SHORT).show()
+                                    FirebaseAuth.getInstance().signOut() // Kullanıcının kayıt olduktan sonra email onaylamadan giriş yapmasını engelliyoruz.
+                                    var intentLogin = Intent(this@RegisterActivity,LoginActivity::class.java)
+                                    startActivity(intentLogin)
+                                }
+                            }
                         }
                         else{
                             Toast.makeText(this@RegisterActivity, "Kayıt İşlemi Sürerken Hata Oluştu.\n"+p0.exception?.message,Toast.LENGTH_SHORT).show()
