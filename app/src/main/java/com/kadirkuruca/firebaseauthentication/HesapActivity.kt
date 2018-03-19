@@ -3,6 +3,7 @@ package com.kadirkuruca.firebaseauthentication
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
@@ -10,7 +11,10 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import kotlinx.android.synthetic.main.activity_hesap.*
 
 class HesapActivity : AppCompatActivity() {
@@ -21,9 +25,7 @@ class HesapActivity : AppCompatActivity() {
 
         var kullanici = FirebaseAuth.getInstance().currentUser
         if(kullanici != null){
-            etMevcutEmail.setText(kullanici.email)
-            if(!kullanici.displayName.isNullOrEmpty())
-            etKullaniciAdi.setText(kullanici.displayName)
+            kullaniciVerileriniOku()
         }
 
         btnSifreSifirla.setOnClickListener {
@@ -105,6 +107,36 @@ class HesapActivity : AppCompatActivity() {
             constraintGuncelle.visibility = View.INVISIBLE
         }
 
+    }
+
+    private fun kullaniciVerileriniOku() {
+
+        var referans = FirebaseDatabase.getInstance().reference
+        var kullanici = FirebaseAuth.getInstance().currentUser
+
+
+        //Metod 1
+        var sorgu = referans.child("kullanici")
+                .orderByKey()
+                .equalTo(kullanici?.uid)
+        sorgu.addListenerForSingleValueEvent(object : ValueEventListener{
+
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot?) {
+
+                for(singleSnapshot in p0!!.children){
+                    var okunanKullanici = singleSnapshot.getValue(Kullanici::class.java)
+                    etKullaniciAdi.setText(okunanKullanici?.isim)
+                    etMevcutPhone.setText(okunanKullanici?.telefon)
+                    etMevcutEmail.setText(kullanici?.email)
+                }
+            }
+
+        })
+        //Metod 2 orderByChild(kullanici_id) ye göre sıralandı.
     }
 
     private fun mailGuncelle() {
