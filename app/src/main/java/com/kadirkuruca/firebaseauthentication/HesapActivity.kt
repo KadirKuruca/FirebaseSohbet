@@ -10,8 +10,8 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.android.synthetic.main.activity_hesap.*
-import kotlinx.android.synthetic.main.fragment_onaymail.*
 
 class HesapActivity : AppCompatActivity() {
 
@@ -40,34 +40,46 @@ class HesapActivity : AppCompatActivity() {
         }
 
         btnDegisiklik.setOnClickListener {
-            progressBarGoster()
-            if(etKullaniciAdi.text.isNotEmpty() && etMevcutEmail.text.isNotEmpty()){
+            if(etKullaniciAdi.text.isNotEmpty() && etMevcutPhone.text.isNotEmpty()){
 
-                if(!etKullaniciAdi.text.toString().equals(kullanici?.displayName.toString())){
+                //Buraya Kontrol Eklenecek
+                /*
 
+
+
+                */
                     var bilgileriGuncelle = UserProfileChangeRequest.Builder()
                             .setDisplayName(etKullaniciAdi.text.toString())
                             .build()
                     kullanici?.updateProfile(bilgileriGuncelle)!!
                             .addOnCompleteListener { task ->
                                 if(task.isSuccessful){
+                                    //Değişiklikleri veritabanına kaydediyoruz.
+                                    FirebaseDatabase.getInstance().reference
+                                            .child("kullanici")
+                                            .child(FirebaseAuth.getInstance().currentUser?.uid)
+                                            .child("isim")
+                                            .setValue(etKullaniciAdi.text.toString())
+                                    FirebaseDatabase.getInstance().reference
+                                            .child("kullanici")
+                                            .child(FirebaseAuth.getInstance().currentUser?.uid)
+                                            .child("telefon")
+                                            .setValue(etMevcutPhone.text.toString())
                                     Toast.makeText(this@HesapActivity,"Değişiklikler Kaydedildi.",Toast.LENGTH_SHORT).show()
                                 }
                                 else{
                                     Toast.makeText(this@HesapActivity,"Değişiklikler Kaydedilirken Hata Oluştu\n"+task.exception?.message,Toast.LENGTH_SHORT).show()
                                 }
-                                progressBarGizle()
                             }
-                }
-            }else{
-                Toast.makeText(this@HesapActivity,"Alanları Boş Bırakmayınız.",Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(this@HesapActivity,"Kaydedilecek Bir Değişiklik Yok.",Toast.LENGTH_SHORT).show()
             }
         }
-
         btnGuncelle.setOnClickListener {
-            if(etEskiParola.text.isNotEmpty()){
+            if(etMevcutPhone.text.isNotEmpty()){
 
-                var credential = EmailAuthProvider.getCredential(kullanici?.email.toString(), etEskiParola.text.toString())
+                var credential = EmailAuthProvider.getCredential(kullanici?.email.toString(), etMevcutPhone.text.toString())
                 kullanici!!.reauthenticate(credential)
                         .addOnCompleteListener { task ->
                             if(task.isSuccessful){
@@ -126,7 +138,7 @@ class HesapActivity : AppCompatActivity() {
     }
 
     private fun parolaGuncelle() {
-        progressBarGoster()
+
         var kullanici = FirebaseAuth.getInstance().currentUser!!
 
         if(kullanici != null){
@@ -134,7 +146,7 @@ class HesapActivity : AppCompatActivity() {
 
                 Toast.makeText(this@HesapActivity,"Şifreler Uyuşmuyor.",Toast.LENGTH_SHORT).show()
             }
-            else if(etYeniParola.text.equals(etEskiParola)){
+            else if(etYeniParola.text.equals(etMevcutPhone)){
                 Toast.makeText(this@HesapActivity,"Yeni Parola Eskisiyle Aynı Olamaz.",Toast.LENGTH_SHORT).show()
             }
             else{
@@ -150,7 +162,7 @@ class HesapActivity : AppCompatActivity() {
                             }
                         }
             }
-            progressBarGizle()
+
 
 
         }
@@ -173,14 +185,6 @@ class HesapActivity : AppCompatActivity() {
 
                     })
         }
-    }
-
-    private fun progressBarGoster(){
-        progressBarHesap.visibility = View.VISIBLE
-    }
-
-    private fun progressBarGizle(){
-        progressBarHesap.visibility = View.INVISIBLE
     }
 
     private fun loginEkraninaDon(){
